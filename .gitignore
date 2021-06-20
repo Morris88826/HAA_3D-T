@@ -1,0 +1,5 @@
+__pycache__
+.DS_Store
+dataset/*
+result/*
+temporal_network/dataset/temporal_data.pkl

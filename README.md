@@ -20,14 +20,17 @@ The RGB videos are the raw images from HAA500.
 
 For 3D skeletal data, we use a 3D lifting tool to lift the 2D joints to 3D, which is implemented based on the open-source EvoSkeleton[2]. The shape of the 3D skeletal data is (num_joints, 4), with dimension one being the (x, y, z, confidence_score) of a joint.
 
-
-
+<p align="center">
+  <img width="400"  src="https://user-images.githubusercontent.com/32810188/122911842-4d413a00-d38a-11eb-8af6-b167504927a1.png" />
+</p>
+ <p align="center"> Figure 1. HAA 3D+T Skeleton Topology</p>
 
 ## Action Classes
 
 Here we provide the action classes that are currently labeled. New classes will be added throughout time.
-![](https://i.imgur.com/VeVT87o.png)
-
+<p align="center">
+  <img src="https://i.imgur.com/M8A8D7N.png" />
+</p>
 
 ## Annotation Tool
 

@@ -56,6 +56,7 @@ Run the ui.py file.
 8. We also provide a temporal network for the tool to estimate the position of the non-visible joints. Users can label only parts of the human body and press (temporal prediction) to select the frames they want to estimate. It not only provides the 2D position it also predicts the skeleton's position in 3D. A more detailed explanation of the temporal network can be found in ...
 10. Users can change the size of the dot and width of the bones in the UI for better visualization.
 11. Motion Smoothing is still under development ...
+12. The saved skeletal data will be stored in './dataset/joints2d' and './dataset/joints3d' respectively.
 
 
 ## References

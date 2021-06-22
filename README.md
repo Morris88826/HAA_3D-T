@@ -34,6 +34,29 @@ Here we provide the action classes that are currently labeled. New classes will 
 
 ## Annotation Tool
 
+### Preparation
+Download the RGB images of HAA500 and put it under the './dataset/raw' folder. 
+
+Install packages from requirements.txt.
+
+### Get Started
+
+Run the ui.py file. 
+
+<img width="1155" alt="Screen Shot 2021-06-23 at 12 37 05 AM" src="https://user-images.githubusercontent.com/32810188/122966526-053b0b00-d3bc-11eb-8bf5-edb34406f22e.png">
+1. Double click the video in the list to enter the annotating page. * means that the annotation is finished. (number of files in joints2d == number of RGB file)
+<img width="1277" alt="Screen Shot 2021-06-23 at 12 43 54 AM" src="https://user-images.githubusercontent.com/32810188/122966748-43382f00-d3bc-11eb-8ecd-d39b54b6eda8.png">
+
+2. In the annotating page, users can use mouse scroll and drag to move the frame into the wanted position. Click [Reset Zoom] button on the right to go back to the default.
+3. To change the frame, use the bar below, or press (z) or (x) on your keyboard to go to the prev/next frame. Scroll the bar quickly for a video-like preview.
+4. Users can press (Load from Alphapose) or (Load from joints2d) to load joints. For Alphapose, it will process to Evoskeleton style.
+5. To label. You can press (l) on your keyboard to start labeling 17 joints. You can also use your keyboard to label a single joint. keys are (4),(5),(q-u), (a-j),(v). You can use the image on the right for the guide. Note that pink is the left arm. Click on the top of the image for labeling. If you want to delete a joint, press (2)
+6. One can label a joint to be occluded/non-visible or non-occluded/visible by toggling (1). In label-everything mode (l), pressing (1) will change the joint to be non-visible, while pressing (3) will mark it visible. Users can also press (Mark all unoccluded) to change all joints to be visible, i.e., confidence score 1.
+7. The tool supports the linear interpolation method by click (Auto interpolate). If you do not like the interpolation for some frames, you can just label correctly on those frames. For those joints that are interpolated, it is marked as visible.
+8. We also provide a temporal network for the tool to estimate the position of the non-visible joints. Users can label only parts of the human body and press (temporal prediction) to select the frames they want to estimate. It not only provides the 2D position it also predicts the skeleton's position in 3D. A more detailed explanation of the temporal network can be found in ...
+10. Users can change the size of the dot and width of the bones in the UI for better visualization.
+11. Motion Smoothing is still under development ...
+
 
 ## References
 [1] Fang HS, Xie S, Tai YW, Lu C. Rmpe: Regional multi-person pose estimation. In Proceedings of the IEEE International Conference on Computer Vision, 2017 (pp. 2334-2343).

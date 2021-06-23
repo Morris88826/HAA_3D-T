@@ -55,7 +55,7 @@ Run the ui.py file.
 7. The tool supports the linear interpolation method by click (Auto interpolate). If you do not like the interpolation for some frames, you can just label correctly on those frames. For those joints that are interpolated, it is marked as visible.
 8. We also provide a temporal network for the tool to estimate the position of the non-visible joints. Users can label only parts of the human body and press (temporal prediction) to select the frames they want to estimate. It not only provides the 2D position it also predicts the skeleton's position in 3D. A more detailed explanation of the temporal network can be found in ...
 10. Users can change the size of the dot and width of the bones in the UI for better visualization.
-11. Motion Smoothing is still under development ...
+11. After users are done annotating all the frames, use motion smoothing to perform gaussian smoothing with sigma 1.
 12. The saved skeletal data will be stored in './dataset/joints2d' and './dataset/joints3d' respectively.
 
 

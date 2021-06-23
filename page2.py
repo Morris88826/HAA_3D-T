@@ -1,5 +1,6 @@
 import tkinter as tk
 import os
+from tkinter.constants import LEFT
 from PIL import ImageTk,Image 
 import os
 import json
@@ -7,6 +8,7 @@ import numpy as np
 from skeleton import joints_key_2_index, joints_index_2_key
 from temp_page import Temporal_window
 from copy import deepcopy
+from scipy.ndimage import gaussian_filter1d
 
 class Page2(tk.Frame):
     def __init__(self, root, controller, parent=None):
@@ -272,8 +274,38 @@ class Page2(tk.Frame):
         self.instruction.create_oval(_x-3, _y-3, _x+3, _y+3, fill='red', outline='red', tags="oval")
         self.current_joint_label.config(text="Current joint: {}".format(joints_index_2_key[self.current_joint]))
 
+    def check_if_all_labeled(self):
+        for joint in range(17):
+            for f in (self.joints2d):
+                if self.joints2d[f] is None:
+                    print('Fail to performance motion smoothing')
+                    print('Please label frame {}, joint {}'.format(f, joint))
+                    return False
+        return True
     def gaussian_smoothing(self):
-        pass
+
+        if self.check_if_all_labeled():
+            for joint in range(17):
+                xs = []
+                ys = []
+                for f in (self.joints2d):
+                    _x = self.joints2d[f][joint][0]
+                    _y = self.joints2d[f][joint][1]
+                    xs.append(_x)
+                    ys.append(_y)
+                
+                new_x = gaussian_filter1d(xs, sigma=1)
+                new_y = gaussian_filter1d(ys, sigma=1)
+
+                for f in (self.joints2d):
+                    self.joints2d[f][joint][0] = new_x[f-1]
+                    self.joints2d[f][joint][1] = new_y[f-1]
+            
+            self.update_skeleton()
+
+
+
+
 
     def temporal_predicting(self):
         self.new = tk.Toplevel(self.root)

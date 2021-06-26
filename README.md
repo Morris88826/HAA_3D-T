@@ -35,9 +35,13 @@ Here we provide the action classes that are currently labeled. New classes will 
 ## Annotation Tool
 
 ### Preparation
-Download the RGB images of HAA500 and put it under the './dataset/raw' folder. 
+1. Download the RGB images of HAA500 and put it under the './dataset/raw' folder. 
 
-Install packages from requirements.txt.
+2. Create the environment and install packages from requirements.txt.
+```
+conda create -n haa python=3.7 
+pip install -r requirements.txt
+```
 
 ### Get Started
 

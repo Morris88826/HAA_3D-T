@@ -3,3 +3,4 @@ __pycache__
 dataset/*
 result/*
 temporal_network/dataset/temporal_data.pkl
+

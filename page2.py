@@ -236,9 +236,11 @@ class Page2(tk.Frame):
                 scores[frame_id] = score
 
         for i in _temp.keys():
+            if i>self.video_length:
+                continue
             tmp = {}
             for j in range(len(joints_index_2_key.keys())):
-                tmp[j] = _temp[i][j]
+                tmp[j] = list(_temp[i][j])
             self.joints2d[i] = tmp
 
         self.update_skeleton()
@@ -338,9 +340,6 @@ class Page2(tk.Frame):
                     self.joints2d[f][joint][1] = new_y[f-1]
             
             self.update_skeleton()
-
-
-
 
 
     def temporal_predicting(self):
@@ -527,6 +526,7 @@ class Page2(tk.Frame):
     def save(self):
         need_save = True
         # check if all are not None
+
         for frame in self.joints2d:
             for joint in self.joints2d[frame]:
                 if self.joints2d[frame][joint] is None:
@@ -534,7 +534,7 @@ class Page2(tk.Frame):
                     need_save = False
         
         if need_save:
-            out_dir = './result'
+            out_dir = './dataset/joints2d'
             video_class = self.path.split('/')[-2]
             video_name = self.path.split('/')[-1]
             if not os.path.exists('{}/{}'.format(out_dir, video_class)):

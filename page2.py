@@ -9,6 +9,7 @@ from skeleton import joints_key_2_index, joints_index_2_key
 from temp_page import Temporal_window
 from copy import deepcopy
 from scipy.ndimage import gaussian_filter1d
+from helper_func import modify_joints
 
 class Page2(tk.Frame):
     def __init__(self, root, controller, parent=None):
@@ -205,8 +206,48 @@ class Page2(tk.Frame):
 
 
     def load_from_alphapose(self):
-        pass
-    
+        path = self.path.replace('raw', 'alphapose')
+        file_path = path+'.json'
+        if not os.path.exists(file_path):
+            return
+
+        with open(file_path, 'rb') as jsonfile:
+            data = json.load(jsonfile)
+
+        # self.joints2d = {}
+        # for i in range(self.video_length):
+        #     frame_id = i + 1
+        #     tmp = {}
+        #     for j in range(len(joints_index_2_key.keys())):
+        #         tmp[j] = None
+        #     self.joints2d[frame_id] = tmp
+
+        _temp = {}
+        scores = {}
+        for d in data:
+            frame_id = int(d['image_id'].split('.')[0])
+            keypoints = np.array(d['keypoints']).reshape((17,3))
+            keypoints[:, -1] = 1
+            keypoints[:, :2] = modify_joints(keypoints[:,:2])
+
+            score = d['score']
+
+            if frame_id in scores.keys():
+                if scores[frame_id] < score:
+                    scores[frame_id] = score
+                    _temp[frame_id] = keypoints
+            else:
+                _temp[frame_id] = keypoints
+                scores[frame_id] = score
+
+        for i in _temp.keys():
+            tmp = {}
+            for j in range(len(joints_index_2_key.keys())):
+                tmp[j] = _temp[i][j]
+            self.joints2d[i] = tmp
+
+        self.update_skeleton()
+
     def joint2d_init(self):
         self.joints2d = {}
         for i in range(self.video_length):

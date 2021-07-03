@@ -52,7 +52,7 @@ Run the ui.py file.
 
 2. In the annotating page, users can use mouse scroll and drag to move the frame into the wanted position. Click [Reset Zoom] button on the right to go back to the default.
 3. To change the frame, use the bar below, or press (z) or (x) on your keyboard to go to the prev/next frame. Scroll the bar quickly for a video-like preview.
-4. Users can press (Load from Alphapose) or (Load from joints2d) to load joints. For Alphapose, it will process to Evoskeleton style.
+4. Users can press (Load from Alphapose) or (Load from joints2d) to load joints. For Alphapose, it will process to Evoskeleton style. If the alphapose information doesn't exist, it will run the AlphaPose network to generate the info file (make sure that your device has cuda). 
 5. To label. You can press (l) on your keyboard to start labeling 17 joints. You can also use your keyboard to label a single joint. keys are (4),(5),(q-u), (a-j),(v). You can use the image on the right for the guide. Note that pink is the left arm. Click on the top of the image for labeling. If you want to delete a joint, press (2)
 6. One can label a joint to be occluded/non-visible or non-occluded/visible by toggling (1). In label-everything mode (l), pressing (1) will change the joint to be non-visible, while pressing (3) will mark it visible. Users can also press (Mark all unoccluded) to change all joints to be visible, i.e., confidence score 1.
 7. The tool supports the linear interpolation method by click (Auto interpolate). If you do not like the interpolation for some frames, you can just label correctly on those frames. For those joints that are interpolated, it is marked as visible.

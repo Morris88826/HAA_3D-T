@@ -204,23 +204,18 @@ class Page2(tk.Frame):
         for key in self.key_bind_table:
             self.controller.unbind(key)
 
+    def run_from_alphapose(self):
+        print('Run alphapose')
 
     def load_from_alphapose(self):
         path = self.path.replace('raw', 'alphapose')
         file_path = path+'.json'
         if not os.path.exists(file_path):
+            self.run_from_alphapose()
             return
 
         with open(file_path, 'rb') as jsonfile:
             data = json.load(jsonfile)
-
-        # self.joints2d = {}
-        # for i in range(self.video_length):
-        #     frame_id = i + 1
-        #     tmp = {}
-        #     for j in range(len(joints_index_2_key.keys())):
-        #         tmp[j] = None
-        #     self.joints2d[frame_id] = tmp
 
         _temp = {}
         scores = {}

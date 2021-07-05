@@ -5,7 +5,7 @@ from PIL import ImageTk,Image
 import os
 import json
 import numpy as np
-from skeleton import joints_key_2_index, joints_index_2_key
+from skeleton import joints_index_2_key
 from temp_page import Temporal_window
 from modify_display import Modify_display_window
 from copy import deepcopy
@@ -572,7 +572,6 @@ class Page2(tk.Frame):
     def draw_3d_skeleton(self, skeleton):
         ax = self.plot_3d.add_subplot(111, projection="3d")
         ax.view_init(elev=180, azim=0)
-
         for i, bones in enumerate(self.bones_indices):
             for bone in (bones):
                 start = bone[0]

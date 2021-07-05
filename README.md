@@ -48,7 +48,8 @@ Run the ui.py file.
 
 <img width="1155" alt="Screen Shot 2021-06-23 at 12 37 05 AM" src="https://user-images.githubusercontent.com/32810188/122966526-053b0b00-d3bc-11eb-8bf5-edb34406f22e.png">
 1. Double click the video in the list to enter the annotating page. * means that the annotation is finished. (number of files in joints2d == number of RGB file)
-<img width="1277" alt="Screen Shot 2021-06-23 at 12 43 54 AM" src="https://user-images.githubusercontent.com/32810188/122966748-43382f00-d3bc-11eb-8ecd-d39b54b6eda8.png">
+<img width="1280" alt="Screen Shot 2021-07-05 at 5 00 58 PM" src="https://user-images.githubusercontent.com/32810188/124446033-a198e080-ddb2-11eb-9359-b03fe32f8dbe.png">
+
 
 2. In the annotating page, users can use mouse scroll and drag to move the frame into the wanted position. Click [Reset Zoom] button on the right to go back to the default.
 3. To change the frame, use the bar below, or press (z) or (x) on your keyboard to go to the prev/next frame. Scroll the bar quickly for a video-like preview.

@@ -76,3 +76,4 @@ class Temporal_window(tk.Frame):
         self.d2['menu'].delete(0, 'end')
         for f in frames:
             self.d2['menu'].add_command(label=f, command=lambda frame=f: self.v2.set(frame))
+

@@ -52,7 +52,6 @@ class _TemporalData(Dataset):
             return joints2d_occ, joints2d_ori
 
     def normalization(self, joints):
-
         if joints.ndim == 3:
             displacement = np.copy(joints[self.time_frames//2, 0, :2])
             joints[:, :, :2] -= displacement

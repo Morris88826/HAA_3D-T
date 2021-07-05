@@ -7,9 +7,17 @@ import json
 import numpy as np
 from skeleton import joints_key_2_index, joints_index_2_key
 from temp_page import Temporal_window
+from modify_display import Modify_display_window
 from copy import deepcopy
 from scipy.ndimage import gaussian_filter1d
 from helper_func import modify_joints
+from mpl_toolkits.mplot3d import Axes3D
+from matplotlib.backends.backend_tkagg import (
+                                    FigureCanvasTkAgg, NavigationToolbar2Tk)
+from matplotlib.figure import Figure
+from temporal_network.EvoSkeleton.load_model import EvoNet 
+import torch
+
 
 class Page2(tk.Frame):
     def __init__(self, root, controller, parent=None):
@@ -41,18 +49,22 @@ class Page2(tk.Frame):
         self.current_joint_label = tk.Label(self.right_frame, text="")
         self.current_joint_label.pack(fill="both", padx=5, pady=5)
 
+        self.frame1 = tk.Frame(self.right_frame)
+        self.frame1.pack(fill="both", padx=5, pady=5)
+        load_alphapose_button = tk.Button(self.frame1, text="Load from alphapose", command=self.load_from_alphapose)
+        load_alphapose_button.grid(row=0, column=0)
+        load_joints2d_button = tk.Button(self.frame1, text="Load from joints2d", command=self.load_from_joints2d)
+        load_joints2d_button.grid(row=0, column=1)
 
-        reset_button = tk.Button(self.right_frame, text="Reset Zoom", command=self.reset_zoom)
-        reset_button.pack(fill="both", padx=5, pady=5)
+        reset_button = tk.Button(self.frame1, text="Reset Zoom", command=self.reset_zoom)
+        reset_button.grid(row=1, column=0)
+        modify_display_button = tk.Button(self.frame1, text="Modify Display", command=self.modify_displaying)
+        modify_display_button.grid(row=1, column=1)
 
-        load_alphapose_button = tk.Button(self.right_frame, text="Load from alphapose", command=self.load_from_alphapose)
-        load_alphapose_button.pack(fill="both", padx=5, pady=5)
-
-        load_joints2d_button = tk.Button(self.right_frame, text="Load from joints2d", command=self.load_from_joints2d)
-        load_joints2d_button.pack(fill="both", padx=5, pady=5)
-
-        label_everything_button = tk.Button(self.right_frame, text="Label Everything or Stop(L)", command=self.label_everything)
-        label_everything_button.pack(fill="both", padx=5, pady=5)
+        label_everything_button = tk.Button(self.frame1, text="Label Everything (L)", command=self.label_everything)
+        label_everything_button.grid(row=2, column=0)
+        all_shown_button = tk.Button(self.frame1, text="Mark all unoccluded", command=self.shown_all)
+        all_shown_button.grid(row=2, column=1)
 
         info_label = tk.Label(self.right_frame, text="To label one joint: (4,5), (q-u), (a-j),(v)", font=("Helvetica", 8))
         info_label.pack(fill="both")
@@ -87,9 +99,6 @@ class Page2(tk.Frame):
 
         self.instruction_size = self.w_width*(1-self.ratio)*(3/5)
 
-        all_shown_button = tk.Button(self.right_frame, text="Mark all unoccluded", command=self.shown_all)
-        all_shown_button.pack(fill="both", padx=5, pady=5)
-
         auto_interpolate_button = tk.Button(self.right_frame, text="Auto interpolate", command=self.auto_interpolate)
         auto_interpolate_button.pack(fill="both", padx=5, pady=5)
 
@@ -99,17 +108,19 @@ class Page2(tk.Frame):
         temporal_prediction_button = tk.Button(self.right_frame, text="Temporal Prediction", command=self.temporal_predicting)
         temporal_prediction_button.pack(fill="both", padx=5, pady=5)
 
-        self.bone_label = tk.Label(self.right_frame, text="Set line width of Bone", fg="black")
-        self.bone_label.pack(fill="both")
-        self.bone_scale = tk.Scale(self.right_frame, from_=1, to=10, orient=tk.HORIZONTAL, command=self.changed_bone)
-        self.bone_scale.pack(side="top", fill="both")
-        self.bone_scale.set(2)
 
-        self.joint_circle_label = tk.Label(self.right_frame, text="Set circle size of joint", fg="black")
-        self.joint_circle_label.pack(fill="both")
-        self.joint_circle_scale = tk.Scale(self.right_frame, from_=1, to=10, orient=tk.HORIZONTAL, command=self.changed_joint_circle)
-        self.joint_circle_scale.pack(side="top", fill="both")
-        self.joint_circle_scale.set(2)
+        # Load Model
+        self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+        self.evoNet_root = './temporal_network/EvoSkeleton/examples'
+        self.evoNet = EvoNet(root = self.evoNet_root).to(self.device)
+        self.evoNet.eval()
+
+        self.show_3d = False
+        display3d_button = tk.Button(self.right_frame, text="Show/close 3D display", command=self.toggle_3d_display)
+        display3d_button.pack(fill="both")
+        self.plot_3d = Figure(figsize=(4, 4), dpi=50)
+        self.display_3d = FigureCanvasTkAgg(self.plot_3d, master=self.right_frame)
+        self.display_3d.get_tk_widget().pack(side="top")
 
         save_exit_button = tk.Button(self.right_frame, text="Save and Exit", command=self.save_and_exit)
         save_exit_button.pack(fill="both", padx=5, pady=5, side="bottom")
@@ -117,12 +128,8 @@ class Page2(tk.Frame):
         exit_button = tk.Button(self.right_frame, text="Exit without Saving", command=self.exit)
         exit_button.pack(fill="both", padx=5, pady=5, side="bottom")
 
-        save_button = tk.Button(self.right_frame, text="Save to joints2d", command=self.save)
-        save_button.pack(fill="both", padx=5, pady=5, side="bottom")
-
         self.alert_label = tk.Label(self.right_frame, text="", fg="red", font=("Helvetica", 8))
         self.alert_label.pack(fill="both", padx=5, pady=5)
-
 
         self.canvas = tk.Canvas(self.left_frame, width=self.w_width*self.ratio, height=self.w_height*self.ratio)
         self.canvas.pack(side="top", padx=10, pady=10, anchor="nw", fill="both", expand=True)
@@ -166,6 +173,7 @@ class Page2(tk.Frame):
         self.zoom = -4
         self.position = [-1, -1]
         self.joint_circle_size = 2
+        self.show_3d = False
         self.canvas.delete("oval")
         self.canvas.delete("bone")
         self.label.config(text="Current frame: {}".format(self.current_frame))
@@ -312,6 +320,12 @@ class Page2(tk.Frame):
         self.instruction.create_oval(_x-3, _y-3, _x+3, _y+3, fill='red', outline='red', tags="oval")
         self.current_joint_label.config(text="Current joint: {}".format(joints_index_2_key[self.current_joint]))
 
+    def check_if_labaled(self, skeleton):
+        for f in skeleton:
+            if skeleton[f] is None:
+                return False
+        return True
+
     def check_if_all_labeled(self):
         for joint in range(17):
             for f in (self.joints2d):
@@ -345,6 +359,10 @@ class Page2(tk.Frame):
     def temporal_predicting(self):
         self.new = tk.Toplevel(self.root)
         self.temporal_window = Temporal_window(self.new, self)
+    
+    def modify_displaying(self):
+        self.new = tk.Toplevel(self.root)
+        self.modify_display_window = Modify_display_window(self.new, self)
 
     def shown_all(self):
         for joint in self.joints2d[self.current_frame]:
@@ -352,14 +370,6 @@ class Page2(tk.Frame):
                 self.joints2d[self.current_frame][joint][-1] = 1
         self.update_skeleton()
 
-    def changed_bone(self, value):
-        self.bone_width = int(value)
-        self.update_skeleton()
-
-    def changed_joint_circle(self, value):
-        self.joint_circle_size = int(value)
-        self.update_skeleton()
-    
 
     def reset_zoom(self):
         self.zoom = -4
@@ -468,12 +478,50 @@ class Page2(tk.Frame):
                     self.current_joint = index
                 self.update_skeleton()
 
+
+    def toggle_3d_display(self):
+        if not self.check_if_labaled(self.joints2d[self.current_frame]):
+            self.plot_3d.clf()
+            return
+        self.show_3d = not self.show_3d
+        self.show_3d_skeleton()
+
+    def to_joints(self, joints_dict):
+        joints = []
+        for i in (joints_dict):
+            info = joints_dict[i]
+            if info == None:
+                info = np.random.rand(17, 3)
+                info[:, -1] = -1
+                info = list(info)
+            joints.append(info)
+        return np.array(joints)
+
+
+    def show_3d_skeleton(self):
+        self.plot_3d.clf()
+        if self.show_3d:
+            joints2d = self.to_joints(self.joints2d[self.current_frame])
+            input = torch.Tensor(joints2d[np.newaxis][:, :, :2]).to(self.device)
+            
+            input = self.evoNet.normalize(input)
+            output = self.evoNet.forward(input)
+            joints3d = self.evoNet.afterprocessing(output)[0]
+
+            self.draw_3d_skeleton(joints3d)
+            # ax = self.plot_3d.add_subplot(111, projection="3d")
+            # t = np.arange(0, 3, .01)
+            # ax.plot(t, 2 * np.sin(2 * np.pi * t))
+
+        self.display_3d.draw()
+
     def show(self):
         path = self.path + '/{:04d}.png'.format(self.current_frame)
         self.image = Image.open(path)
         self.img_size = self.image.size
         self.update_image()
         self.update_skeleton()
+
 
     def update_skeleton(self):
         self.instruction.delete("oval")
@@ -489,6 +537,11 @@ class Page2(tk.Frame):
             skeleton = self.joints2d[self.current_frame]
         except:
             return
+
+        if self.show_3d and self.check_if_labaled(skeleton):
+            self.show_3d_skeleton()
+        else:
+            self.show_3d = False
 
         self.canvas.delete("oval")
         self.canvas.delete("bone")
@@ -516,6 +569,22 @@ class Page2(tk.Frame):
                 self.canvas.create_oval(position[0]-r, position[1]-r, position[0]+r, position[1]+r, 
                 fill=color, outline=color, tags='oval')
     
+    def draw_3d_skeleton(self, skeleton):
+        ax = self.plot_3d.add_subplot(111, projection="3d")
+        ax.view_init(elev=180, azim=0)
+
+        for i, bones in enumerate(self.bones_indices):
+            for bone in (bones):
+                start = bone[0]
+                end = bone[1]
+
+                x0, y0, z0 = list(skeleton[start])
+                x1, y1, z1 = list(skeleton[end])
+                ax.plot([x0, x1], [y0, y1], [z0, z1])
+        # draw dots
+        ax.scatter(skeleton[:, 0], skeleton[:, 1], skeleton[:, 2])
+
+
     def update_image(self):
         size = self.img_size
         new_size = (int(size[0] * 2**(self.zoom/5)), int(size[1] * 2**(self.zoom/5)))

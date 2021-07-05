@@ -36,3 +36,5 @@ def get_joints2d(data):
     joints2d = np.reshape(np.array(data['keypoints']), (-1, 3))[:,:2]
     joints2d = modify_joints(joints2d)
     return joints2d
+
+

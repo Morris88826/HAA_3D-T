@@ -39,7 +39,10 @@ Here we provide the action classes that are currently labeled. New classes will 
 
 2. Create the environment and install packages from requirements.txt. Conda version: 4.8.3
 ```
-conda create --name haa --file requirements.txt python=3.7
+conda create --name haa python=3.7
+conda activate haa
+pip install numpy
+pip install -r requirements.txt
 ```
 
 ### Get Started

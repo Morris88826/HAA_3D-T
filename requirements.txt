@@ -1,53 +1,47 @@
-# This file may be used to create an environment using:
-# $ conda create --name <env> --file <this file>
-# platform: osx-64
-blas=1.0=mkl
-ca-certificates=2020.10.14=0
-cached-property=1.5.2=pypi_0
-certifi=2020.6.20=py37_0
-cycler=0.10.0=py_2
-freetype=2.10.4=ha233b18_0
-h5py=3.3.0=pypi_0
-intel-openmp=2020.2=258
-jpeg=9b=he5867d9_2
-kiwisolver=1.3.1=py37h23ab428_0
-lcms2=2.11=h92f6f08_0
-libcxx=10.0.0=1
-libffi=3.3=hb1e8313_2
-libgfortran=3.0.1=h93005f0_2
-libpng=1.6.37=ha441bb4_0
-libtiff=4.1.0=hcb84e12_1
-libuv=1.40.0=haf1e3a3_0
-lz4-c=1.9.2=h79c402e_3
-matplotlib=3.2.2=1
-matplotlib-base=3.2.2=py37hddda452_1
-mkl=2019.4=233
-mkl-service=2.3.0=py37hfbe908c_0
-mkl_fft=1.2.0=py37hc64f4ea_0
-mkl_random=1.1.1=py37h959d312_0
-ncurses=6.2=h0a44026_1
-ninja=1.10.2=hf7b0b51_1
-numpy=1.19.1=py37h3b9f5b6_0
-numpy-base=1.19.1=py37hcfb5961_0
-olefile=0.46=py37_0
-openssl=1.1.1k=h0d85af4_0
-pillow=8.0.0=py37h1a82f1a_0
-pip=21.1.2=py37hecd8cb5_0
-pyparsing=2.4.7=pyh9f0ad1d_0
-python=3.7.10=h88f2d9e_0
-python-dateutil=2.8.1=py_0
-python_abi=3.7=2_cp37m
-pytorch=1.9.0=py3.7_0
-readline=8.1=h9ed2024_0
-scipy=1.5.2=py37h912ce22_0
-setuptools=52.0.0=py37hecd8cb5_0
-six=1.15.0=py_0
-sqlite=3.36.0=hce871da_0
-tk=8.6.10=hb0a8c7a_0
-tornado=6.1=py37hf967b71_1
-tqdm=4.61.1=pyhd8ed1ab_0
-typing_extensions=3.7.4.3=pyha847dfd_0
-wheel=0.36.2=pyhd3eb1b0_0
-xz=5.2.5=h1de35cc_0
-zlib=1.2.11=h1de35cc_3
-zstd=1.4.4=h1990bb4_3
+cached-property==1.5.2
+certifi==2021.5.30
+cffi @ file:///opt/concourse/worker/volumes/live/ca3c0fea-9d0f-4489-6889-89b42078ed37/volume/cffi_1613246931142/work
+chardet==4.0.0
+cycler==0.10.0
+Cython==0.29.23
+cython-bbox==0.1.3
+easydict==1.9
+h5py==3.3.0
+idna==2.10
+jsonpatch==1.32
+jsonpointer==2.1
+kiwisolver @ file:///opt/concourse/worker/volumes/live/1e6d28e8-da14-4365-7344-567a05db7efc/volume/kiwisolver_1612282399491/work
+m3u8downloader==0.10.0
+matplotlib @ file:///Users/runner/miniforge3/conda-bld/matplotlib-base_1594091703837/work
+mkl-fft==1.2.0
+mkl-random==1.1.1
+mkl-service==2.3.0
+munkres==1.1.4
+natsort==7.0.1
+numpy @ file:///opt/concourse/worker/volumes/live/40d975a3-7e82-44c8-53df-feccdbce8b96/volume/numpy_and_numpy_base_1596233859108/work
+olefile==0.46
+opencv-python==4.5.2.54
+Pillow @ file:///opt/concourse/worker/volumes/live/28f094e1-d4b0-436d-6751-607fa59ce512/volume/pillow_1602788716788/work
+protobuf==4.0.0rc2
+pycocotools==2.0.0
+pycparser @ file:///tmp/build/80754af9/pycparser_1594388511720/work
+pyparsing==2.4.7
+python-dateutil==2.8.1
+PyYAML==5.4.1
+pyzmq==22.1.0
+requests==2.25.1
+scipy @ file:///opt/concourse/worker/volumes/live/9698578f-91da-4d5f-6fce-b26b1f42eb5a/volume/scipy_1597686637948/work
+six==1.15.0
+tensorboardX==2.4
+terminaltables==3.1.0
+timm==0.1.20
+torch @ file:///opt/concourse/worker/volumes/live/11e8f1df-b219-4bb1-5397-3a9589bb82c1/volume/pytorch_1614404301885/work
+torchfile==0.1.0
+torchvision @ file:///opt/concourse/worker/volumes/live/4f5a83ed-467a-4726-57b4-f7cdab6bb897/volume/torchvision_1622219705983/work
+tornado @ file:///Users/runner/miniforge3/conda-bld/tornado_1610094698292/work
+tqdm @ file:///home/conda/feedstock_root/build_artifacts/tqdm_1623518955413/work
+typing-extensions @ file:///tmp/build/80754af9/typing_extensions_1624965014186/work
+urllib3==1.26.6
+visdom==0.1.8.9
+websocket-client==1.1.0
+wells==1.5.0

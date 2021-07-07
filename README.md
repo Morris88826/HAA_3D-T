@@ -36,6 +36,8 @@ Recently added:
 
 +basketball_dribble
 
++basketball_layup
+
 ## Annotation Tool
 
 ### Preparation

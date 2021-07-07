@@ -32,6 +32,10 @@ Here we provide the action classes that are currently labeled. New classes will 
   <img src="https://i.imgur.com/M8A8D7N.png" />
 </p>
 
+Recently added:
+
++basketball_dribble
+
 ## Annotation Tool
 
 ### Preparation

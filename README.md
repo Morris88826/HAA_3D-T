@@ -34,6 +34,8 @@ Here we provide the action classes that are currently labeled. New classes will 
 
 Recently added:
 
++baseball_pitch
+
 +basketball_dribble
 
 +basketball_layup

@@ -52,7 +52,7 @@ class Page1(tk.Frame):
             for j, video_name in enumerate(sorted(videos[class_name])):
                 text_name = video_name
                 if os.path.exists("./dataset/joints2d/{}/{}".format(class_name, video_name)):
-                    if len(glob.glob("./dataset/joints2d/{}/{}/*.json".format(class_name, video_name))) >= len(glob.glob("./dataset/raw/{}/{}/*.png".format(class_name, video_name))):
+                    if len(glob.glob("./dataset/joints2d/{}/{}/*.json".format(class_name, video_name))) == len(glob.glob("./dataset/raw/{}/{}/*.png".format(class_name, video_name))):
                         text_name += ' *'
                 self.treeview.insert(class_name, j+1, video_name, text = text_name)
 

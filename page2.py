@@ -63,8 +63,27 @@ class Page2(tk.Frame):
 
         label_everything_button = tk.Button(self.frame1, text="Label Everything (L)", command=self.label_everything)
         label_everything_button.grid(row=2, column=0)
-        all_shown_button = tk.Button(self.frame1, text="Mark all unoccluded", command=self.shown_all)
-        all_shown_button.grid(row=2, column=1)
+
+        temporal_prediction_button = tk.Button(self.frame1, text="Temporal Prediction", command=self.temporal_predicting)
+        temporal_prediction_button.grid(row=2, column=1)
+
+        # all_shown_button = tk.Button(self.frame1, text="Mark all unoccluded", command=self.shown_all)
+        # all_shown_button.grid(row=2, column=1)
+
+
+        self.switch_frame = tk.Frame(self.right_frame)
+        self.switch_frame.pack(fill="both", padx=5, pady=5)
+
+        self.switch_variable = tk.StringVar(value="off")
+        off_button = tk.Radiobutton(self.switch_frame, text="Off", variable=self.switch_variable,
+                                    indicatoron=False, value="off", width=8, command=self.make_all_occ_or_unocc)
+        o_button = tk.Radiobutton(self.switch_frame, text="All Occluded", variable=self.switch_variable,
+                                    indicatoron=False, value="occluded", command=self.make_all_occ_or_unocc)
+        uo_button = tk.Radiobutton(self.switch_frame, text="All Unoccluded", variable=self.switch_variable,
+                                    indicatoron=False, value="unoccluded", command=self.make_all_occ_or_unocc)
+        off_button.pack(side="left")
+        o_button.pack(side="left")
+        uo_button.pack(side="left")
 
         info_label = tk.Label(self.right_frame, text="To label one joint: (4,5), (q-u), (a-j),(v)", font=("Helvetica", 8))
         info_label.pack(fill="both")
@@ -104,10 +123,6 @@ class Page2(tk.Frame):
 
         smoothing_button = tk.Button(self.right_frame, text="Motion Smoothing", command=self.gaussian_smoothing)
         smoothing_button.pack(fill="both", padx=5, pady=5)
-
-        temporal_prediction_button = tk.Button(self.right_frame, text="Temporal Prediction", command=self.temporal_predicting)
-        temporal_prediction_button.pack(fill="both", padx=5, pady=5)
-
 
         # Load Model
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -174,6 +189,8 @@ class Page2(tk.Frame):
         self.position = [-1, -1]
         self.joint_circle_size = 2
         self.show_3d = False
+        self.show_3d_skeleton()
+
         self.canvas.delete("oval")
         self.canvas.delete("bone")
         self.label.config(text="Current frame: {}".format(self.current_frame))
@@ -197,6 +214,7 @@ class Page2(tk.Frame):
         self.controller.bind('1', self.event_handler)
         self.controller.bind('2', self.event_handler)
         self.controller.bind('3', self.event_handler)
+        self.controller.bind('0', self.event_handler)
         self.controller.bind('l', self.event_handler)
         for key in self.key_bind_table:
             self.controller.bind(key, self.event_handler)
@@ -208,7 +226,9 @@ class Page2(tk.Frame):
         self.controller.unbind('1')
         self.controller.unbind('2')
         self.controller.unbind('3')
+        self.controller.unbind('0')
         self.controller.unbind('l')
+        
         for key in self.key_bind_table:
             self.controller.unbind(key)
 
@@ -269,6 +289,9 @@ class Page2(tk.Frame):
         
         for i in range(self.video_length):
             frame_id = i + 1
+
+            if not os.path.exists(path+'/{:04d}.json'.format(frame_id)):
+                continue
             with open(path+'/{:04d}.json'.format(frame_id)) as jsonfile:
                 d = json.load(jsonfile)
             d = np.array(d).reshape((17, -1))
@@ -370,6 +393,14 @@ class Page2(tk.Frame):
                 self.joints2d[self.current_frame][joint][-1] = 1
         self.update_skeleton()
 
+    def make_all_occ_or_unocc(self):
+        if self.switch_variable.get() == 'off':
+            return
+        confidence_score = -1 if self.switch_variable.get() == 'occluded' else 1
+        for joint in self.joints2d[self.current_frame]:
+            if self.joints2d[self.current_frame][joint] is not None:
+                self.joints2d[self.current_frame][joint][-1] = confidence_score
+        self.update_skeleton()
 
     def reset_zoom(self):
         self.zoom = -4
@@ -383,6 +414,7 @@ class Page2(tk.Frame):
     def changed_frame(self, value):
         self.current_frame = int(value)
         self.label.config(text="Current frame: {}".format(self.current_frame))
+        self.switch_variable.set('off')
         self.show()
 
     def event_handler(self, event):
@@ -431,13 +463,16 @@ class Page2(tk.Frame):
                 self.current_frame = max(1, self.current_frame)
                 self.changed_frame(self.current_frame)
                 self.scale.set(self.current_frame)
+                self.switch_variable.set("off")
+                
             elif event.char == 'x':
                 self.current_frame += 1
                 self.current_frame = min(self.video_length, self.current_frame)
                 self.changed_frame(self.current_frame)
                 self.scale.set(self.current_frame)
+                self.switch_variable.set("off")
             
-            elif event.char == '1' or event.char == '2' or event.char=='3':
+            elif event.char == '1' or event.char == '2' or event.char=='3' or event.char=='0':
                 if self.current_joint != -1:
                     if self.joints2d[self.current_frame][self.current_joint] != None:
                         if event.char == '1':
@@ -455,14 +490,21 @@ class Page2(tk.Frame):
                                 if self.current_joint == 17:
                                     self.current_joint = -1
                             
-
-
-                        else:
+                        elif event.char == '2':
                             self.joints2d[self.current_frame][self.current_joint] = None
                             try:
                                 self.user_selected[self.current_joint].pop(self.current_frame)
                             except:
                                 pass
+                        
+                if event.char=='0':
+                    for i in range(17):
+                        self.joints2d[self.current_frame][i] = None
+                        try:
+                            self.user_selected[i].pop(self.current_frame)
+                        except:
+                            pass
+    
 
                         self.update_skeleton()
             elif event.char == 'l':
@@ -621,6 +663,8 @@ class Page2(tk.Frame):
                 
                 with open(out_path+'/{:04d}.json'.format(frame), 'w') as jsonfile:
                     json.dump(my_list, jsonfile)
+            
+            print('Saved')
         
     def exit(self):
         self.key_unbinding()

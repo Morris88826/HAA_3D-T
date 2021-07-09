@@ -1,25 +1,22 @@
-import tkinter
-import numpy as np
-from mpl_toolkits.mplot3d import Axes3D
-from matplotlib.backends.backend_tkagg import (
-                                    FigureCanvasTkAgg, NavigationToolbar2Tk)
-from matplotlib.figure import Figure
+import tkinter as tk
 
-root = tkinter.Tk()
-root.wm_title("Embedding in Tk")
+root = tk.Tk()
 
-fig = Figure(figsize=(5, 4), dpi=100)
+switch_frame = tk.Frame(root)
+switch_frame.pack()
 
-canvas = FigureCanvasTkAgg(fig, master=root)  # A tk.DrawingArea.
-canvas.draw()
+switch_variable = tk.StringVar(value="off")
+off_button = tk.Radiobutton(switch_frame, text="Off", variable=switch_variable,
+                            indicatoron=False, value="off", width=8)
+low_button = tk.Radiobutton(switch_frame, text="Low", variable=switch_variable,
+                            indicatoron=False, value="low", width=8)
+med_button = tk.Radiobutton(switch_frame, text="Medium", variable=switch_variable,
+                            indicatoron=False, value="medium", width=8)
+high_button = tk.Radiobutton(switch_frame, text="High", variable=switch_variable,
+                             indicatoron=False, value="high", width=8)
+off_button.pack(side="left")
+low_button.pack(side="left")
+med_button.pack(side="left")
+high_button.pack(side="left")
 
-ax = fig.add_subplot(111, projection="3d")
-t = np.arange(0, 3, .01)
-ax.plot(t, 2 * np.sin(2 * np.pi * t))
-
-toolbar = NavigationToolbar2Tk(canvas, root)
-toolbar.update()
-canvas.get_tk_widget().pack(side=tkinter.TOP, fill=tkinter.BOTH, expand=1)
-
-
-tkinter.mainloop()
+root.mainloop()

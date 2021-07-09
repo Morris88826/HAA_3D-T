@@ -40,6 +40,18 @@ Recently added:
 
 +basketball_layup
 
++play_leaf-flute
+
++play_lute
+
++play_maracas
+
++play_melodic
+
++play_noseflute
+
++play_ocarina
+
 ## Annotation Tool
 
 ### Preparation

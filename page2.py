@@ -669,6 +669,8 @@ class Page2(tk.Frame):
             
 
             for frame in self.joints2d:
+                if frame > self.video_length:
+                    break
                 my_list = []
                 my_list_wc = []
                 for joint in sorted(self.joints2d[frame]):

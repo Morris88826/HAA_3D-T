@@ -190,6 +190,7 @@ class Page2(tk.Frame):
         self.joint_circle_size = 2
         self.show_3d = False
         self.show_3d_skeleton()
+        self.switch_variable.set('off')
 
         self.canvas.delete("oval")
         self.canvas.delete("bone")
@@ -283,9 +284,11 @@ class Page2(tk.Frame):
             self.joints2d[frame_id] = tmp
     
     def load_from_joints2d(self):
-        path = self.path.replace('raw', 'joints2d')
+        path = self.path.replace('raw', 'joints2d_wc')
         if not os.path.exists(path):
-            return
+            path = self.path.replace('raw', 'joints2d')
+            if not os.path.exists(path):
+                return
         
         for i in range(self.video_length):
             frame_id = i + 1
@@ -645,6 +648,8 @@ class Page2(tk.Frame):
         
         if need_save:
             out_dir = './dataset/joints2d'
+            if not os.path.exists(out_dir):
+                os.mkdir(out_dir)
             video_class = self.path.split('/')[-2]
             video_name = self.path.split('/')[-1]
             if not os.path.exists('{}/{}'.format(out_dir, video_class)):
@@ -652,17 +657,28 @@ class Page2(tk.Frame):
             out_path = '{}/{}/{}'.format(out_dir, video_class, video_name)
             if not os.path.exists(out_path):
                 os.mkdir(out_path)
+            
+            out_dir_wc = './dataset/joints2d_wc'
+            if not os.path.exists(out_dir_wc):
+                os.mkdir(out_dir_wc)
+            if not os.path.exists('{}/{}'.format(out_dir_wc, video_class)):
+                os.mkdir('{}/{}'.format(out_dir_wc, video_class))
+            out_path_wc = '{}/{}/{}'.format(out_dir_wc, video_class, video_name)
+            if not os.path.exists(out_path_wc):
+                os.mkdir(out_path_wc)
+            
 
             for frame in self.joints2d:
                 my_list = []
+                my_list_wc = []
                 for joint in sorted(self.joints2d[frame]):
-                    if self.save_v1:
-                        my_list += self.joints2d[frame][joint][:2]
-                    else:
-                        my_list += self.joints2d[frame][joint]
+                    my_list += self.joints2d[frame][joint][:2]
+                    my_list_wc += self.joints2d[frame][joint]
                 
                 with open(out_path+'/{:04d}.json'.format(frame), 'w') as jsonfile:
                     json.dump(my_list, jsonfile)
+                with open(out_path_wc+'/{:04d}.json'.format(frame), 'w') as jsonfile:
+                    json.dump(my_list_wc, jsonfile)
             
             print('Saved')
         

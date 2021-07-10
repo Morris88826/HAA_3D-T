@@ -217,6 +217,7 @@ class Page2(tk.Frame):
         self.controller.bind('3', self.event_handler)
         self.controller.bind('0', self.event_handler)
         self.controller.bind('l', self.event_handler)
+        self.controller.bind('`', self.event_handler)
         for key in self.key_bind_table:
             self.controller.bind(key, self.event_handler)
 
@@ -229,6 +230,7 @@ class Page2(tk.Frame):
         self.controller.unbind('3')
         self.controller.unbind('0')
         self.controller.unbind('l')
+        self.controller.unbind('`')
         
         for key in self.key_bind_table:
             self.controller.unbind(key)
@@ -474,6 +476,15 @@ class Page2(tk.Frame):
                 self.changed_frame(self.current_frame)
                 self.scale.set(self.current_frame)
                 self.switch_variable.set("off")
+
+            elif event.char == '`':
+                if self.current_joint != -1:
+                    for i in range(self.video_length):
+                        frame_id = i + 1
+                        if self.joints2d[frame_id][self.current_joint] is not None:
+                            self.joints2d[frame_id][self.current_joint][-1] = -1*self.joints2d[frame_id][self.current_joint][-1]
+                self.update_skeleton()
+
             
             elif event.char == '1' or event.char == '2' or event.char=='3' or event.char=='0':
                 if self.current_joint != -1:
@@ -509,7 +520,7 @@ class Page2(tk.Frame):
                             pass
     
 
-                        self.update_skeleton()
+                self.update_skeleton()
             elif event.char == 'l':
                 self.label_everything()
 

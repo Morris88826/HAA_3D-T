@@ -62,6 +62,8 @@ Recently added:
 
 +basketball_shoot
 
++beer_pong_throw
+
 +bench_dip
 
 +bending_back

@@ -60,6 +60,8 @@ Recently added:
 
 +CPR
 
++basketball_shoot
+
 +bench_dip
 
 +bending_back

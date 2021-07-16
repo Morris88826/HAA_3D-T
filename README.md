@@ -60,6 +60,8 @@ Recently added:
 
 +CPR
 
++bench_dip
+
 ## Annotation Tool
 
 ### Preparation

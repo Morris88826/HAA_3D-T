@@ -156,6 +156,7 @@ class Page2(tk.Frame):
         self.scale.pack(side="top", fill="both")
 
         # Page 2 information
+        self.num_joints = 17
         self.current_frame = 1
         self.current_joint = -1
         self.video_length = -1
@@ -201,7 +202,7 @@ class Page2(tk.Frame):
         self.joint2d_init()
 
         self.user_selected = {}
-        for i in range(17):
+        for i in range(self.num_joints):
             self.user_selected[i] = {}
 
     def key_binding(self):
@@ -218,6 +219,8 @@ class Page2(tk.Frame):
         self.controller.bind('0', self.event_handler)
         self.controller.bind('l', self.event_handler)
         self.controller.bind('`', self.event_handler)
+        self.controller.bind('o', self.event_handler)
+        self.controller.bind('p', self.event_handler)
         for key in self.key_bind_table:
             self.controller.bind(key, self.event_handler)
 
@@ -231,6 +234,8 @@ class Page2(tk.Frame):
         self.controller.unbind('0')
         self.controller.unbind('l')
         self.controller.unbind('`')
+        self.controller.unbind('o')
+        self.controller.unbind('p')
         
         for key in self.key_bind_table:
             self.controller.unbind(key)
@@ -252,7 +257,7 @@ class Page2(tk.Frame):
         scores = {}
         for d in data:
             frame_id = int(d['image_id'].split('.')[0])
-            keypoints = np.array(d['keypoints']).reshape((17,3))
+            keypoints = np.array(d['keypoints']).reshape((self.num_joints,3))
             keypoints[:, -1] = 1
             keypoints[:, :2] = modify_joints(keypoints[:,:2])
 
@@ -299,10 +304,10 @@ class Page2(tk.Frame):
                 continue
             with open(path+'/{:04d}.json'.format(frame_id)) as jsonfile:
                 d = json.load(jsonfile)
-            d = np.array(d).reshape((17, -1))
+            d = np.array(d).reshape((self.num_joints, -1))
             if d.shape[-1] == 2:
                 tmp = d
-                d = np.ones((17,3))
+                d = np.ones((self.num_joints,3))
                 d[:,:2] = tmp
 
             for j in range(len(joints_index_2_key.keys())):
@@ -355,7 +360,7 @@ class Page2(tk.Frame):
         return True
 
     def check_if_all_labeled(self):
-        for joint in range(17):
+        for joint in range(self.num_joints):
             for f in (self.joints2d):
                 if self.joints2d[f] is None:
                     print('Fail to performance motion smoothing')
@@ -365,7 +370,7 @@ class Page2(tk.Frame):
     def gaussian_smoothing(self):
 
         if self.check_if_all_labeled():
-            for joint in range(17):
+            for joint in range(self.num_joints):
                 xs = []
                 ys = []
                 for f in (self.joints2d):
@@ -450,7 +455,7 @@ class Page2(tk.Frame):
                 if self.label_everything_mode:
                     self.current_joint += 1
                     self.instruction.delete("oval")
-                    if self.current_joint == 17:
+                    if self.current_joint == self.num_joints:
                         self.current_joint = -1
                         self.label_everything_mode = False
                 self.update_skeleton()
@@ -485,6 +490,19 @@ class Page2(tk.Frame):
                             self.joints2d[frame_id][self.current_joint][-1] = -1*self.joints2d[frame_id][self.current_joint][-1]
                 self.update_skeleton()
 
+            elif event.char == 'o' or event.char == 'p':
+                if event.char == 'o':
+                    for i in range(self.num_joints):
+                        if (self.joints2d[self.current_frame][i] is not None) and (self.current_frame not in self.user_selected[i].keys()):
+                            self.user_selected[i][self.current_frame] = self.joints2d[self.current_frame][i]
+                else:
+                    for i in range(self.num_joints):
+                        try:
+                            self.user_selected[i].pop(self.current_frame)
+                        except:
+                            pass
+
+
             
             elif event.char == '1' or event.char == '2' or event.char=='3' or event.char=='0':
                 if self.current_joint != -1:
@@ -495,13 +513,13 @@ class Page2(tk.Frame):
                             else:
                                 self.joints2d[self.current_frame][self.current_joint][-1] = -1
                                 self.current_joint += 1
-                                if self.current_joint == 17:
+                                if self.current_joint == self.num_joints:
                                     self.current_joint = -1
                         elif event.char == '3':
                             if self.label_everything_mode:
                                 self.joints2d[self.current_frame][self.current_joint][-1] = 1
                                 self.current_joint += 1
-                                if self.current_joint == 17:
+                                if self.current_joint == self.num_joints:
                                     self.current_joint = -1
                             
                         elif event.char == '2':
@@ -512,7 +530,7 @@ class Page2(tk.Frame):
                                 pass
                         
                 if event.char=='0':
-                    for i in range(17):
+                    for i in range(self.num_joints):
                         self.joints2d[self.current_frame][i] = None
                         try:
                             self.user_selected[i].pop(self.current_frame)
@@ -547,7 +565,7 @@ class Page2(tk.Frame):
         for i in (joints_dict):
             info = joints_dict[i]
             if info == None:
-                info = np.random.rand(17, 3)
+                info = np.random.rand(self.num_joints, 3)
                 info[:, -1] = -1
                 info = list(info)
             joints.append(info)

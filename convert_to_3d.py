@@ -6,6 +6,8 @@ import os
 import json
 from matplotlib.figure import Figure
 import tqdm
+import argparse
+
 
 def visualize(joints3d):
 
@@ -38,13 +40,18 @@ def visualize(joints3d):
     plot_3d.savefig('./example.png')
 
 if __name__ == '__main__':
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--pose', '-p', help='name of the class')
+    args = parser.parse_args()
+
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     evoNet_root = './temporal_network/EvoSkeleton/examples'
     evoNet = EvoNet(root = evoNet_root).to(device)
     evoNet.eval()
 
 
-    class_name = 'burpee'
+    class_name = args.pose
     folder_root = './dataset/joints2d/{}'.format(class_name)
 
     target_root = folder_root.replace('joints2d', 'joints3d')

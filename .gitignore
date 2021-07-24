@@ -1,6 +1,6 @@
 __pycache__
 .DS_Store
 dataset/*
-result/*
+results/*
 temporal_network/dataset/temporal_data.pkl
 

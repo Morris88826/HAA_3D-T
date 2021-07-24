@@ -1,7 +1,6 @@
 import torch
 import torch.nn as nn
 from .network import ConvBlock 
-import libs.evoskeleton.model as libm
 from EvoSkeleton.load_model import EvoNet 
 import numpy as np
 

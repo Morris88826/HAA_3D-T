@@ -1,15 +1,6 @@
 import tkinter as tk
-from tkinter import Frame, ttk
-import glob
-from collections import defaultdict
-from PIL import ImageTk,Image 
-import json
-import os
-import numpy as np
-from helper_func import modify_joints
-from scipy.ndimage import gaussian_filter1d
-from page1 import Page1
-from page2 import Page2
+from libs.ui.page1 import Page1
+from libs.ui.page2 import Page2
 
 class MainView(tk.Tk):
     def __init__(self, *args, **kwargs):

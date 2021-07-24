@@ -5,18 +5,18 @@ from PIL import ImageTk,Image
 import os
 import json
 import numpy as np
-from skeleton import joints_index_2_key
-from temp_page import Temporal_window
-from modify_display import Modify_display_window
 from copy import deepcopy
 from scipy.ndimage import gaussian_filter1d
-from helper_func import modify_joints
+from .helper_func import modify_joints
 from mpl_toolkits.mplot3d import Axes3D
 from matplotlib.backends.backend_tkagg import (
                                     FigureCanvasTkAgg, NavigationToolbar2Tk)
 from matplotlib.figure import Figure
 from temporal_network.EvoSkeleton.load_model import EvoNet 
 import torch
+from .skeleton import joints_index_2_key
+from .temp_page import Temporal_window
+from .modify_display import Modify_display_window
 
 
 class Page2(tk.Frame):
@@ -92,7 +92,7 @@ class Page2(tk.Frame):
 
         self.instruction = tk.Canvas(self.right_frame, width=self.w_width*(1-self.ratio)*(3/5), height=self.w_width*(1-self.ratio)*(3/5))
         self.instruction.pack(side="top")
-        img = Image.open("./instruction.jpg")
+        img = Image.open("./libs/ui/instruction.jpg")
         img = img.resize((int(self.w_width*(1-self.ratio)*(3/5)), int(self.w_width*(1-self.ratio)*(3/5))))
         self.inst_img = ImageTk.PhotoImage(img)
         self.instruction.create_image(0,0, image=self.inst_img, anchor="nw")

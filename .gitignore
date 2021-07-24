@@ -4,3 +4,4 @@ dataset/*
 results/*
 temporal_network/dataset/temporal_data.pkl
 
+HAA Action Classes.numbers

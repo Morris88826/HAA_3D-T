@@ -83,6 +83,25 @@ Recently added:
 +play_sitar
 
 +play_suona
+
+---
+
++ play_tambourine
+
++ play_thereminvox
+
++ play_timpani
+
++ play_triangle
+
++ play_trombone
+
++ play_trumpet
+
++ play_ukelele
+
++ play_voila
+
 ## Annotation Tool
 
 ### Preparation

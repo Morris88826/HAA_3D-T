@@ -2,9 +2,9 @@ import torch
 import numpy as np
 from torch.autograd import Variable
 from torch.utils.data import Dataset, DataLoader
-from .EvoSkeleton.load_model import EvoNet 
-from .libs.model import TemporalConvNet
-from .libs.util import rigid_transformation
+from libs.evoskeleton.load_model import EvoNet 
+from libs.temporal_network.libs.model import TemporalConvNet
+from libs.temporal_network.libs.util import rigid_transformation
 
 class _TemporalData(Dataset):
     def __init__(self, joints2d_occ=None, data_package=None, time_frames=9):
@@ -74,11 +74,10 @@ class TemporalModel():
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
         # Load Model
-        self.evoNet_root = './temporal_network/EvoSkeleton/examples'
-        self.evoNet = EvoNet(root = self.evoNet_root).to(self.device)
+        self.evoNet = EvoNet().to(self.device)
         self.evoNet.eval()
 
-        self.temp_ckpt = './temporal_network/checkpoints/train_2.pth'
+        self.temp_ckpt = './libs/temporal_network/checkpoints/train_2.pth'
         self.temporal_net = TemporalConvNet(in_channels=51, out_channels=34).to(self.device)
         self.temporal_net.load_state_dict(torch.load(self.temp_ckpt, map_location=self.device)['model'])
         self.temporal_net.eval()
@@ -88,12 +87,11 @@ class TemporalModel():
         return DataLoader(dataset, batch_size=batch_size)
 
     def forward(self, x, get_3d=True):
+
         intermediate = x = self.temporal_net(x)
 
         if get_3d:
-            x = self.evoNet.normalize(x)
-            x = self.evoNet(x)
-            x = self.evoNet.afterprocessing(x)
+            x = self.evoNet.predict(x)
             return intermediate, x
         else:
             return intermediate
@@ -107,6 +105,7 @@ class TemporalModel():
             joints2d_pred_recover[i] = scale*joints2d_pred[i] + translation
 
         return joints2d_pred_recover 
+
     def predict(self, images, get_3d=True):
         assert images.shape == (images.shape[0], 17, 3)
         dataloader = self.process_input(images, batch_size=10)

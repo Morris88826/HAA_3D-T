@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 from .network import ConvBlock 
-from EvoSkeleton.load_model import EvoNet 
+from libs.evoskeleton.load_model import EvoNet 
 import numpy as np
 
 class Joints3dNet(nn.Module):

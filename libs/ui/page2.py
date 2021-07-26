@@ -1,6 +1,6 @@
 import tkinter as tk
 import os
-from tkinter.constants import LEFT
+from tkinter.constants import LEFT, NO
 from PIL import ImageTk,Image 
 import os
 import json
@@ -12,11 +12,12 @@ from mpl_toolkits.mplot3d import Axes3D
 from matplotlib.backends.backend_tkagg import (
                                     FigureCanvasTkAgg, NavigationToolbar2Tk)
 from matplotlib.figure import Figure
-from temporal_network.EvoSkeleton.load_model import EvoNet 
+from libs.evoskeleton.load_model import EvoNet 
 import torch
 from .skeleton import joints_index_2_key
 from .temp_page import Temporal_window
 from .modify_display import Modify_display_window
+from libs.alignment.skeleton import Skeleton
 
 
 class Page2(tk.Frame):
@@ -126,8 +127,7 @@ class Page2(tk.Frame):
 
         # Load Model
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-        self.evoNet_root = './temporal_network/EvoSkeleton/examples'
-        self.evoNet = EvoNet(root = self.evoNet_root).to(self.device)
+        self.evoNet = EvoNet().to(self.device)
         self.evoNet.eval()
 
         self.show_3d = False
@@ -390,6 +390,8 @@ class Page2(tk.Frame):
 
 
     def temporal_predicting(self):
+        print('Having some bug, currently undergoing fixing process ~')
+        # return
         self.new = tk.Toplevel(self.root)
         self.temporal_window = Temporal_window(self.new, self)
     
@@ -425,6 +427,11 @@ class Page2(tk.Frame):
         self.current_frame = int(value)
         self.label.config(text="Current frame: {}".format(self.current_frame))
         self.switch_variable.set('off')
+
+        self.label_everything_mode = False
+        self.instruction.delete("oval")
+        self.current_joint = -1
+        self.current_joint_label.config(text="Current joint: None")
         self.show()
 
     def event_handler(self, event):
@@ -578,14 +585,8 @@ class Page2(tk.Frame):
             joints2d = self.to_joints(self.joints2d[self.current_frame])
             input = torch.Tensor(joints2d[np.newaxis][:, :, :2]).to(self.device)
             
-            input = self.evoNet.normalize(input)
-            output = self.evoNet.forward(input)
-            joints3d = self.evoNet.afterprocessing(output)[0]
-
+            joints3d = self.evoNet.predict(input)[0]
             self.draw_3d_skeleton(joints3d)
-            # ax = self.plot_3d.add_subplot(111, projection="3d")
-            # t = np.arange(0, 3, .01)
-            # ax.plot(t, 2 * np.sin(2 * np.pi * t))
 
         self.display_3d.draw()
 
@@ -643,10 +644,21 @@ class Page2(tk.Frame):
                 self.canvas.create_oval(position[0]-r, position[1]-r, position[0]+r, position[1]+r, 
                 fill=color, outline=color, tags='oval')
     
-    def draw_3d_skeleton(self, skeleton):
+    def draw_3d_skeleton(self, skeleton, elev=-80, azim=-90):
         ax = self.plot_3d.add_subplot(111, projection="3d")
-        ax.view_init(elev=180, azim=0)
-        for i, bones in enumerate(self.bones_indices):
+
+        max_range = np.amax(np.abs(skeleton))
+        ax.set(xlim = [-max_range, max_range], ylim=[-max_range, max_range], zlim=[-max_range, max_range])
+        # ax.view_init(elev=180, azim=0)
+
+        bones_indices = [
+            [[0,4],[4,5],[5,6],[8,11],[11,12],[12,13]], # left -> pink
+            [[0,1],[1,2],[2,3],[8,14],[14,15],[15,16]], # right -> blue
+            [[0,7],[7,8],[8,9],[9,10]] # black
+        ] # left-> pink, right->blue
+
+
+        for i, bones in enumerate(bones_indices):
             for bone in (bones):
                 start = bone[0]
                 end = bone[1]
@@ -654,9 +666,24 @@ class Page2(tk.Frame):
                 x0, y0, z0 = list(skeleton[start])
                 x1, y1, z1 = list(skeleton[end])
                 ax.plot([x0, x1], [y0, y1], [z0, z1])
-        # draw dots
-        ax.scatter(skeleton[:, 0], skeleton[:, 1], skeleton[:, 2])
 
+        # draw dots
+        sk = Skeleton()
+        for i in range(17):
+            if sk.dict_idx_2_joint[i] in (sk.body_parts['torso'] + sk.body_parts['head']):
+                ax.scatter(skeleton[i, 0], skeleton[i, 1], skeleton[i, 2], c='b')
+            elif sk.dict_idx_2_joint[i] in (sk.body_parts['left_leg'] + sk.body_parts['left_arm']):
+                ax.scatter(skeleton[i, 0], skeleton[i, 1], skeleton[i, 2], c='r')
+            elif sk.dict_idx_2_joint[i] in (sk.body_parts['right_leg'] + sk.body_parts['right_arm']):
+                ax.scatter(skeleton[i, 0], skeleton[i, 1], skeleton[i, 2], c='g')
+            else:
+                raise NotImplementedError
+
+
+        ax.set(xlabel='x', ylabel='y', zlabel='z')
+        ax.view_init(elev=elev, azim=azim)
+        # ax.invert_zaxis()
+        return
 
     def update_image(self):
         size = self.img_size

@@ -10,8 +10,8 @@ import logging
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 
-import libs.dataset.h36m.cameras as cameras
-import libs.dataset.h36m.pth_dataset as dataset
+import libs.evoskeleton.dataset.h36m.cameras as cameras
+import libs.evoskeleton.dataset.h36m.pth_dataset as dataset
 
 # Human3.6m IDs for training and testing
 TRAIN_SUBJECTS = [1, 5, 6, 7, 8]

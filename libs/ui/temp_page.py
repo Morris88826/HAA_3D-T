@@ -1,6 +1,6 @@
 import tkinter as tk
 import numpy as np
-from temporal_network.main import TemporalModel
+from libs.temporal_network.main import TemporalModel
 
 class Temporal_window(tk.Frame):
     def __init__(self, master, parent):

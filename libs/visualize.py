@@ -3,7 +3,8 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 from matplotlib.figure import Figure
 import json
-from alignment.skeleton import Skeleton
+from libs.alignment.skeleton import Skeleton
+from libs.util import get_golden_circle
 
 
 bones_indices = [
@@ -12,8 +13,31 @@ bones_indices = [
     [[0,7],[7,8],[8,9],[9,10]] # black
 ] # left-> pink, right->blue
 
-def plot_2d(joints2d, ax):
-    ax.set(xlim = [0, 1024], ylim=[720, 0])
+
+def plot_camera(ax, position, axes, color='black'):
+    ax.scatter(position[0], position[1], position[2], c=color)
+
+    axes = axes/10
+    ax.plot([position[0], (position+axes[0])[0]], [position[1], (position+axes[0])[1]], [position[2], (position+axes[0])[2]], c='r')
+    ax.plot([position[0], (position+axes[1])[0]], [position[1], (position+axes[1])[1]], [position[2], (position+axes[1])[2]], c='g')
+    ax.plot([position[0], (position+axes[2])[0]], [position[1], (position+axes[2])[1]], [position[2], (position+axes[2])[2]], c='b')
+
+    return
+
+def plot_golden_circle(ax):
+
+    vertices, adjacency_matrix = get_golden_circle()
+    connection = np.tril(adjacency_matrix, -1).T
+
+    for i in range(connection.shape[0]):
+        nodes = np.argwhere(connection[i]==1).flatten()
+        for n in nodes:
+            ax.plot([vertices[i][0], vertices[n][0]], [vertices[i][1], vertices[n][1]], [vertices[i][2], vertices[n][2]], c='gray')
+
+    return
+
+def plot_2d(joints2d, ax, xlim=[-1,1], ylim=[1,-1]):
+    ax.set(xlim = xlim, ylim=ylim)
     sk = Skeleton()
 
     for _, bones in enumerate(bones_indices):
@@ -37,11 +61,9 @@ def plot_2d(joints2d, ax):
             raise NotImplementedError
 
 
-def plot_3d(joints3d, ax):
+def plot_3d(joints3d, ax, elev=-70, azim=-90,  max_range=1):
 
-    elev=-80
-    azim=-90
-    max_range = 1000
+
     ax.set(xlim = [-max_range, max_range], ylim=[-max_range, max_range], zlim=[-max_range,max_range])
 
     for _, bones in enumerate(bones_indices):

@@ -113,41 +113,41 @@ def test():
     visualize(class_name, video_idx, frame_idx)
 
 if __name__ == '__main__':
-    test()
+    # test()
 
-    # parser = argparse.ArgumentParser()
-    # parser.add_argument('--pose', '-p', help='Name of the class')
-    # args = parser.parse_args()
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--pose', '-p', help='Name of the class')
+    args = parser.parse_args()
 
-    # device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    # model = EvoNet()
-    # model.eval()
+    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    model = EvoNet()
+    model.eval()
 
 
-    # class_name = args.pose
-    # folder_root = './dataset/joints2d/{}'.format(class_name)
+    class_name = args.pose
+    folder_root = './dataset/joints2d/{}'.format(class_name)
 
-    # target_root = folder_root.replace('joints2d', 'joints3d')
+    target_root = folder_root.replace('joints2d', 'joints3d')
 
-    # if not os.path.exists('./dataset/joints3d'):
-    #     os.mkdir('./dataset/joints3d')
+    if not os.path.exists('./dataset/joints3d'):
+        os.mkdir('./dataset/joints3d')
 
-    # if not os.path.exists(target_root):
-    #     os.mkdir(target_root)
+    if not os.path.exists(target_root):
+        os.mkdir(target_root)
 
-    # for subfolder in tqdm.tqdm(sorted(glob.glob(folder_root+'/*'))):
+    for subfolder in tqdm.tqdm(sorted(glob.glob(folder_root+'/*'))):
 
-    #     # load joints2d
-    #     target_folder = subfolder.replace('joints2d','joints3d')
-    #     if not os.path.exists(target_folder):
-    #         os.mkdir(target_folder)
+        # load joints2d
+        target_folder = subfolder.replace('joints2d','joints3d')
+        if not os.path.exists(target_folder):
+            os.mkdir(target_folder)
 
-    #     for frame in sorted(glob.glob(subfolder+'/*')):
-    #         with open(frame, 'rb') as jsonfile:
-    #             data = np.array(json.load(jsonfile)).reshape((17,-1))
+        for frame in sorted(glob.glob(subfolder+'/*')):
+            with open(frame, 'rb') as jsonfile:
+                data = np.array(json.load(jsonfile)).reshape((17,-1))
 
-    #             input_data = torch.from_numpy(data.astype(np.float32)).unsqueeze(0)
+                input_data = torch.from_numpy(data.astype(np.float32)).unsqueeze(0)
                 
-    #             joints3d = model.predict(input_data)[0]
-    #             np.save(target_folder+'/{}.npy'.format(frame.split('/')[-1].split('.')[0]), joints3d)
+                joints3d = model.predict(input_data)[0]
+                np.save(target_folder+'/{}.npy'.format(frame.split('/')[-1].split('.')[0]), joints3d)
         

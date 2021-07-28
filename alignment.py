@@ -9,6 +9,7 @@ import tqdm
 import os
 import matplotlib.cm as cm
 import argparse
+from libs.visualize import plot_2d, plot_3d, plot_camera
 
 def visualize_camera(reference_joints3d, camera_rotation_matrices):
     bones_indices = [
@@ -86,6 +87,41 @@ def visualize_camera(reference_joints3d, camera_rotation_matrices):
     ax.legend()
     plt.show()
 
+def visualize_alignment(input_skeleton_3d, reference_skeleton_3d, camera_rotation_matrix=None):
+    
+    if camera_rotation_matrix is None:
+        _, R  = rotation_matrix_3d(input_skeleton_3d, reference_skeleton_3d)
+        camera_rotation_matrix = np.linalg.inv(R) # input to reference
+    fig1 = plt.figure(figsize=(10, 10),dpi=50)
+    ax = fig1.add_subplot(111, projection="3d")
+    plot_3d(reference_skeleton_3d, ax)
+    reference_camera_position = np.array([0,0,-1])
+    selected_camera_position = np.matmul(np.linalg.inv(camera_rotation_matrix), reference_camera_position.T).T
+    plot_camera(ax, reference_camera_position, np.identity(3), color='blue')
+    plot_camera(ax, selected_camera_position, camera_rotation_matrix, color='red')
+
+
+    fig2 = plt.figure(2, figsize=(20, 10),dpi=50)
+    ax2 = fig2.add_subplot(221)
+    plot_2d(reference_skeleton_3d[:, :-1], ax2)
+    ax2.set(title='Reference: Default View')
+
+    ax2 = fig2.add_subplot(222)
+    rotated_reference_skeleton_3d = np.matmul(camera_rotation_matrix, reference_skeleton_3d.T).T
+    plot_2d(rotated_reference_skeleton_3d[:, :-1], ax2)
+    ax2.set(title='Reference: Input Camera View')
+
+    ax2 = fig2.add_subplot(223)
+    plot_2d(input_skeleton_3d[:, :-1], ax2)
+    ax2.set(title='Input: Default View')
+
+    ax2 = fig2.add_subplot(224)
+    rotated_input_skeleton_3d = np.matmul(np.linalg.inv(camera_rotation_matrix), input_skeleton_3d.T).T
+    plot_2d(rotated_input_skeleton_3d[:, :-1], ax2)
+    ax2.set(title='Input: Aligned View')
+    
+    return
+
 
 def visualize(input_joints3d, input_joints2d, reference_joints3d, reference_joints2d, camera_rotation_matrices, video_idx=1):
 
@@ -103,8 +139,8 @@ def visualize(input_joints3d, input_joints2d, reference_joints3d, reference_join
 
 
     max_range = 1
-    ax.set(xlim = [-max_range, max_range], ylim=[-max_range, max_range], zlim=[max_range,-max_range])
-    # ax.view_init(elev=180, azim=0)
+    ax.set(xlim = [-max_range, max_range], ylim=[-max_range, max_range], zlim=[-max_range,max_range])
+    ax.view_init(elev=-80, azim=-90)
 
     # reference_joints3d = input_joints3d
     for _, bones in enumerate(bones_indices):
@@ -129,7 +165,7 @@ def visualize(input_joints3d, input_joints2d, reference_joints3d, reference_join
             raise NotImplementedError
 
     # draw camera
-    default_camera = np.array([0, -1, 0])
+    default_camera = np.array([0, 0, -1])
     default_camera_x = np.array([0.1, 0, 0])
     default_camera_y =np.array([0, 0.1, 0])
     default_camera_z = np.array([0, 0, 0.1])
@@ -143,7 +179,8 @@ def visualize(input_joints3d, input_joints2d, reference_joints3d, reference_join
 
         if i != video_idx:
             continue
-        camera_rotation = np.linalg.inv(camera_rotation_matrices[i])
+        # camera_rotation = np.linalg.inv(camera_rotation_matrices[i])
+        camera_rotation = camera_rotation_matrices[i]
 
         camera_point = np.matmul(camera_rotation, default_camera.T).T
         camera_x = np.matmul(camera_rotation, default_camera_x.T).T
@@ -169,77 +206,77 @@ def visualize(input_joints3d, input_joints2d, reference_joints3d, reference_join
     ax.set(xlabel='x', ylabel='y', zlabel='z')
 
 
-    # Camera 2D view, First Fig
-    camera_view = plt.figure(1, figsize=(20, 10), dpi=50)
-    ax = camera_view.add_subplot(221)
-    for _, bones in enumerate(bones_indices):
-        for bone in (bones):
-            start = bone[0]
-            end = bone[1]
+    # # Camera 2D view, First Fig
+    # camera_view = plt.figure(1, figsize=(20, 10), dpi=50)
+    # ax = camera_view.add_subplot(221)
+    # for _, bones in enumerate(bones_indices):
+    #     for bone in (bones):
+    #         start = bone[0]
+    #         end = bone[1]
 
-            x0, y0 = list(reference_joints2d[start])
-            x1, y1 = list(reference_joints2d[end])
-            ax.plot([x0, x1], [y0, y1])
-    ax.scatter(reference_joints2d[:, 0], reference_joints2d[:, 1], s=1)
-    ax.set_xlim(-1280,1280)
-    ax.set_ylim(1280,-1280)
-    ax.set_title('Reference, Default Angle')
+    #         x0, y0 = list(reference_joints2d[start])
+    #         x1, y1 = list(reference_joints2d[end])
+    #         ax.plot([x0, x1], [y0, y1])
+    # ax.scatter(reference_joints2d[:, 0], reference_joints2d[:, 1], s=1)
+    # ax.set_xlim(-1280,1280)
+    # ax.set_ylim(1280,-1280)
+    # ax.set_title('Reference, Default Angle')
 
 
 
-    # Second Fig
-    ax = camera_view.add_subplot(222)
-    camera_rotation = camera_rotation_matrices[video_idx]
-    reference_projected_joints2d = np.copy(reference_sample_3d)
-    reference_projected_joints2d = (np.matmul(camera_rotation,reference_projected_joints2d.T)).T
-    for _, bones in enumerate(bones_indices):
-        for bone in (bones):
-            start = bone[0]
-            end = bone[1]
+    # # Second Fig
+    # ax = camera_view.add_subplot(222)
+    # camera_rotation = camera_rotation_matrices[video_idx]
+    # reference_projected_joints2d = np.copy(reference_sample_3d)
+    # reference_projected_joints2d = (np.matmul(np.linalg.inv(camera_rotation),reference_projected_joints2d.T)).T
+    # for _, bones in enumerate(bones_indices):
+    #     for bone in (bones):
+    #         start = bone[0]
+    #         end = bone[1]
 
-            x0, y0 = list(reference_projected_joints2d[start][[0,2]])
-            x1, y1 = list(reference_projected_joints2d[end][[0,2]])
-            ax.plot([x0, x1], [y0, y1])
-    ax.scatter(reference_projected_joints2d[:, 0], reference_projected_joints2d[:, 2], s=1)
-    ax.set_xlim(-1,1)
-    ax.set_ylim(1,-1)
-    ax.set_title('Reference, Video {} Angle'.format(video_idx))
+    #         x0, y0 = list(reference_projected_joints2d[start][[0,2]])
+    #         x1, y1 = list(reference_projected_joints2d[end][[0,2]])
+    #         ax.plot([x0, x1], [y0, y1])
+    # ax.scatter(reference_projected_joints2d[:, 0], reference_projected_joints2d[:, 2], s=1)
+    # ax.set_xlim(-1,1)
+    # ax.set_ylim(1,-1)
+    # ax.set_title('Reference, Video {} Angle'.format(video_idx))
     
-    # Thrid Fig
-    ax = camera_view.add_subplot(223)
-    for _, bones in enumerate(bones_indices):
-        for bone in (bones):
-            start = bone[0]
-            end = bone[1]
+    # # Thrid Fig
+    # ax = camera_view.add_subplot(223)
+    # for _, bones in enumerate(bones_indices):
+    #     for bone in (bones):
+    #         start = bone[0]
+    #         end = bone[1]
 
-            x0, y0 = list(input_joints2d[start])
-            x1, y1 = list(input_joints2d[end])
-            ax.plot([x0, x1], [y0, y1])
-    ax.scatter(input_joints2d[:, 0], input_joints2d[:, 1], s=1)
-    ax.set_xlim(-1280,1280)
-    ax.set_ylim(1280,-1280)
-    ax.set_title('Video {}, Original Angle'.format(video_idx))
+    #         x0, y0 = list(input_joints2d[start])
+    #         x1, y1 = list(input_joints2d[end])
+    #         ax.plot([x0, x1], [y0, y1])
+    # ax.scatter(input_joints2d[:, 0], input_joints2d[:, 1], s=1)
+    # ax.set_xlim(-1280,1280)
+    # ax.set_ylim(1280,-1280)
+    # ax.set_title('Video {}, Original Angle'.format(video_idx))
 
 
-    # Fourth Fig
-    ax = camera_view.add_subplot(224)
-    camera_rotation = camera_rotation_matrices[video_idx]
-    original_projected_joints2d = np.copy(input_joints3d)
-    new_projected_joints2d = (np.matmul(np.linalg.inv(camera_rotation),original_projected_joints2d.T)).T
-    for _, bones in enumerate(bones_indices):
-        for bone in (bones):
-            start = bone[0]
-            end = bone[1]
+    # # Fourth Fig
+    # ax = camera_view.add_subplot(224)
+    # camera_rotation = camera_rotation_matrices[video_idx]
+    # original_projected_joints2d = np.copy(input_joints3d)
+    # new_projected_joints2d = (np.matmul(np.linalg.inv(camera_rotation),original_projected_joints2d.T)).T
+    # for _, bones in enumerate(bones_indices):
+    #     for bone in (bones):
+    #         start = bone[0]
+    #         end = bone[1]
 
-            x0, y0 = list(new_projected_joints2d[start][[0,2]])
-            x1, y1 = list(new_projected_joints2d[end][[0,2]])
-            ax.plot([x0, x1], [y0, y1])
-    ax.scatter(new_projected_joints2d[:, 0], new_projected_joints2d[:, 2], s=1)
-    ax.set_xlim(-1,1)
-    ax.set_ylim(1,-1)
-    ax.set_title('Aligned View')
+    #         x0, y0 = list(new_projected_joints2d[start][[0,2]])
+    #         x1, y1 = list(new_projected_joints2d[end][[0,2]])
+    #         ax.plot([x0, x1], [y0, y1])
+    # ax.scatter(new_projected_joints2d[:, 0], new_projected_joints2d[:, 2], s=1)
+    # ax.set_xlim(-1,1)
+    # ax.set_ylim(1,-1)
+    # ax.set_title('Aligned View')
 
-    camera_view.suptitle('Video {}'.format(video_idx))
+    # camera_view.suptitle('Video {}'.format(video_idx))
     
     plt.show()
         
@@ -267,7 +304,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     
-    frame_indices = [1, 5, 10]
+    frame_indices = [1]#, 5, 10]
     class_name = args.pose
     save_rotation_matrix = args.save
     target_video_idx = args.target_vid

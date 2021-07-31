@@ -4,8 +4,10 @@ from mpl_toolkits.mplot3d import Axes3D
 from matplotlib.figure import Figure
 import json
 from libs.alignment.skeleton import Skeleton
-from libs.util import get_golden_circle
-
+from libs.util import get_golden_circle, find_camera_rotation, rel_error
+import os
+import seaborn as sn
+import pandas as pd
 
 bones_indices = [
     [[0,4],[4,5],[5,6],[8,11],[11,12],[12,13]], # left -> pink
@@ -13,6 +15,14 @@ bones_indices = [
     [[0,7],[7,8],[8,9],[9,10]] # black
 ] # left-> pink, right->blue
 
+def plot_confusion_matrix(array, vid_1, vid_2):
+    df_cm = pd.DataFrame(array, index = [i+1 for i in range(array.shape[0])],
+                    columns = [i+1 for i in range(array.shape[1])])
+    fig = plt.figure(figsize = (10,7))
+    sn.heatmap(df_cm, annot=False)
+    ax = fig.add_subplot(111)
+    ax.set(xlabel='Video {}'.format(vid_2), ylabel='Video {}'.format(vid_1))
+    return fig
 
 def plot_camera(ax, position, axes, color='black'):
     ax.scatter(position[0], position[1], position[2], c=color)
@@ -23,6 +33,35 @@ def plot_camera(ax, position, axes, color='black'):
     ax.plot([position[0], (position+axes[2])[0]], [position[1], (position+axes[2])[1]], [position[2], (position+axes[2])[2]], c='b')
 
     return
+
+def plot_skeleton_3d(skeleton_3d, camera_idx, suptitle=None):
+
+    camera_position, _ = get_golden_circle()
+    selected_camera_position = camera_position[camera_idx]
+    default_camera_position = np.array([0,0,-1])      
+
+
+    # Plot
+    fig1 = plt.figure(1, figsize=(20, 10),dpi=50)
+    ax1= fig1.add_subplot(121, projection="3d")
+    plot_golden_circle(ax1)
+    plot_3d(skeleton_3d, ax1)
+    plot_camera(ax1, default_camera_position, np.identity(3), color='blue')
+    camera_rotation = find_camera_rotation(default_camera_position, selected_camera_position) # default to selected
+    assert rel_error(np.matmul(camera_rotation, default_camera_position), selected_camera_position) < 1e-6
+    plot_camera(ax1, selected_camera_position, np.linalg.inv(camera_rotation), color='red')
+
+    
+    ax1 = fig1.add_subplot(122)
+    rotated_skeleton_3d = np.matmul(np.linalg.inv(camera_rotation), skeleton_3d.T).T
+    plot_2d(rotated_skeleton_3d[:, :-1], ax1)
+    ax1.set(title='View {}'.format(camera_idx))   
+
+    if suptitle is not None:
+        fig1.suptitle(suptitle)
+
+    return fig1
+
 
 def plot_golden_circle(ax):
 

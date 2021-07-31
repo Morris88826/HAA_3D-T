@@ -195,3 +195,6 @@ def normalize_skeleton(all_skeletons):
             normalized_all_skeletons[i] = all_skeletons[i] + displacement
 
         return normalized_all_skeletons
+
+
+

@@ -113,7 +113,6 @@ def test():
     visualize(class_name, video_idx, frame_idx)
 
 if __name__ == '__main__':
-    # test()
 
     parser = argparse.ArgumentParser()
     parser.add_argument('--pose', '-p', help='Name of the class')

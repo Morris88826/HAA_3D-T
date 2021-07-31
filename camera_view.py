@@ -9,38 +9,13 @@ from mpl_toolkits.mplot3d import Axes3D
 from math import sqrt
 from libs.visualize import plot_3d, plot_2d, plot_golden_circle, plot_camera
 from libs.alignment.skeleton import normalize_skeleton
-from libs.util import cartesian_to_spherical, rel_error, load_skeletons, get_golden_circle, find_distance
+from libs.util import rel_error, load_skeletons, get_golden_circle, find_camera_rotation
 from libs.alignment.skeleton import Skeleton3d
-from alignment import visualize_alignment
 from libs.alignment.find_rotation import rotation_matrix_3d
 import tqdm
 
 
-def find_camera_rotation(reference, position):
-    _, theta1, phi1 = cartesian_to_spherical(reference)
-    _, theta2, phi2 = cartesian_to_spherical(position)
 
-    d_theta = theta2-theta1
-    d_phi = phi2-phi1
-
-    Rx = np.identity(3)
-    Ry = np.identity(3)
-    Rz = np.identity(3)
-
-    Ry[0,0] = math.cos(d_theta)
-    Ry[0,2] = math.sin(d_theta)
-    Ry[2,0] = -math.sin(d_theta)
-    Ry[2,2] = math.cos(d_theta)
-
-
-    Rz[:-1, :-1] = np.array(
-        [[math.cos(d_phi), -math.sin(d_phi)],
-        [math.sin(d_phi), math.cos(d_phi)]]
-    )
-
-    R = np.linalg.multi_dot([Rz, Rx, Ry])
-
-    return R
 
 def visualize_different_angle(class_name, video_idx, camera_rotation_matrix=None):
     frame_idx = 1
@@ -118,8 +93,8 @@ def visualize_different_angle(class_name, video_idx, camera_rotation_matrix=None
 
 def main():
     # load skeleton
-    class_name = 'abseiling'
-    frame_idx = 0
+    class_name = 'burpee'
+    frame_idx = 1
     rf_skeletons_2d, rf_skeletons_3d = load_skeletons(class_name, frame_idx)
     
     n_skeletons_2d = normalize_skeleton(rf_skeletons_2d)
@@ -168,20 +143,14 @@ def main():
 
         plt.show()
 
-    video_idx = 3
-    input_skeleton_2d = n_skeletons_2d[video_idx]
-    input_skeleton_3d = n_skeletons_3d[video_idx]
-
-    visualize_alignment(input_skeleton_3d, rf_skeleton_3d)
-    plt.show()
-
 
 if __name__ == '__main__':
-    class_name = 'bench_dip'
-    video_idx = 5
-    camera_rotation_matrix = None
-    if os.path.exists('./results/camera_rotation/{}/{}_{:03d}.npy'.format(class_name, class_name, video_idx)):
-        camera_rotation_matrix =  np.load('./results/camera_rotation/{}/{}_{:03d}.npy'.format(class_name, class_name, video_idx))
+    main()
+    # class_name = 'bench_dip'
+    # video_idx = 5
+    # camera_rotation_matrix = None
+    # if os.path.exists('./results/camera_rotation/{}/{}_{:03d}.npy'.format(class_name, class_name, video_idx)):
+    #     camera_rotation_matrix =  np.load('./results/camera_rotation/{}/{}_{:03d}.npy'.format(class_name, class_name, video_idx))
 
-    visualize_different_angle(class_name, video_idx, camera_rotation_matrix)
+    # visualize_different_angle(class_name, video_idx, camera_rotation_matrix)
    

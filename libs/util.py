@@ -67,6 +67,32 @@ def spherical_to_cartesian(spherical_pos):
 def rel_error(x,y):
     return np.max(np.abs(x - y) / (np.maximum(1e-8, np.abs(x) + np.abs(y))))
 
+def find_camera_rotation(reference, position):
+    _, theta1, phi1 = cartesian_to_spherical(reference)
+    _, theta2, phi2 = cartesian_to_spherical(position)
+
+    d_theta = theta2-theta1
+    d_phi = phi2-phi1
+
+    Rx = np.identity(3)
+    Ry = np.identity(3)
+    Rz = np.identity(3)
+
+    Ry[0,0] = math.cos(d_theta)
+    Ry[0,2] = math.sin(d_theta)
+    Ry[2,0] = -math.sin(d_theta)
+    Ry[2,2] = math.cos(d_theta)
+
+
+    Rz[:-1, :-1] = np.array(
+        [[math.cos(d_phi), -math.sin(d_phi)],
+        [math.sin(d_phi), math.cos(d_phi)]]
+    )
+
+    R = np.linalg.multi_dot([Rz, Rx, Ry])
+
+    return R
+
 
 def load_skeletons(class_name, frame_idx=None):
 

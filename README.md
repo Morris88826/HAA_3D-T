@@ -102,6 +102,24 @@ Recently added:
 
 +play_thereminvox
 
+---
+
++play_violin
+
++play_xylophone
+
++play_yangqin
+
++play_yoyo
+
++pottery_wheel
+
++pouring_wine
+
++punching_speedbag
+
++push_car
+
 
 ## Annotation Tool
 

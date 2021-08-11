@@ -120,6 +120,30 @@ Recently added:
 
 +push_car
 
+---
+
++punching_sandbag
+
++push_wheelchair
+
++push_wheelchair_alone
+
++putting_scarf_on
+
++quadruped_hip_extension
+
++read_newspaper
+
++read_book
+
+---
+
++racewalk_walk
+
++rescue_breathing
+
++remove_car_tire
+
 
 ## Annotation Tool
 

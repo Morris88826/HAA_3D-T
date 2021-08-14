@@ -112,12 +112,6 @@ Recently added:
 
 +play_yoyo
 
-+pottery_wheel
-
-+pouring_wine
-
-+punching_speedbag
-
 +push_car
 
 ---
@@ -128,7 +122,7 @@ Recently added:
 
 +push_wheelchair_alone
 
-+putting_scarf_on
++pottery_wheel
 
 +quadruped_hip_extension
 
@@ -138,11 +132,15 @@ Recently added:
 
 ---
 
++putting_scarf_on
+
++pouring_wine
+
++punching_speedbag
+
 +racewalk_walk
 
 +rescue_breathing
-
-+remove_car_tire
 
 
 ## Annotation Tool
